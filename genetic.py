@@ -14,30 +14,34 @@ def FindCmb(names,dline,HSI):
     profit_lb=12
     def target(x):
         x=SplitPointToPersent(x)
-        closeall=np.dot(dline,x)-HSI
+        closeall=np.dot(dline,x)/HSI
         poslist=np.array(range(len(closeall)))
         try:
             popt, pcov=curve_fit(profitfun, poslist, closeall,p0=np.array([1,0,0]))
         except:
-            return 10000000000.0
-        p=int((((1+popt[1])**250)-1)*100)
+            return 0,10000000000.0
+        p=(1+popt[1])**250
+        p=int((p-1)*100)
 
         dirline=profitfun(np.array(poslist,dtype=np.float64),*popt)
         #sqrtmean=np.sqrt(np.sum((closeall-dirline)**2/dirline))
         errorline=((closeall-dirline)/dirline)**2
         sqrtmean=np.sqrt(np.mean(errorline))+2*np.sqrt(np.max(errorline))
         if p<profit_lb:
-            return 100*(profit_lb-p)+sqrtmean
-        return sqrtmean
+            return p,100*(profit_lb-p)+sqrtmean
+        return p,sqrtmean
 
     class Pop(object):
         def __init__(self,x):
             self.x=x
+            self.p=float("nan")
             self.sq=float("nan")
         def cp(self):
             return Pop(self.x.copy())
     def eval(pop):
-        pop.sq=target(pop.x)
+        res=target(pop.x)
+        pop.p=res[0]
+        pop.sq=res[1]
         return pop
     pop=[]
     for i in range(300):
@@ -69,7 +73,7 @@ def FindCmb(names,dline,HSI):
         if minsq>pop[0].sq:
             minsq=pop[0].sq
             keepcount=0
-            print(minsq)
+            print(minsq,"  ",pop[0].p)
         else:
             keepcount+=1
             if keepcount>500:
