@@ -15,7 +15,7 @@ def FindCmb(names,dline,HSI):
     profit_lb=12
     def target(x):
         x=SplitPointToPersent(x)
-        closeall=np.dot(dline,x)-HSI
+        closeall=np.dot(dline,x)/HSI
         poslist=np.array(range(len(closeall)))
         try:
             popt, pcov=curve_fit(profitfun, poslist, closeall,p0=np.array([1,0,0]))
