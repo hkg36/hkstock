@@ -47,16 +47,18 @@ def FindCmb(names,dline,HSI):
     for i in range(300):
         p=Pop(np.random.rand(len(names)-1))
         pop.append(p)
-    pop=list(map(eval,pop))
+    pop=[eval(one) for one in pop]
     def mate(x1,x2):
-        x1=x1.cp()
-        x2=x2.cp()
-        for i in range(x1.x.shape[0]):
-            if np.random.random()>0.5:
-                mid=x1.x[i]
-                x1.x[i]=x2.x[i]
-                x2.x[i]=mid
-        return x1,x2
+        newer=[]
+        for s in range(4):
+            param=[0]*x1.x.shape[0]
+            for i in range(x1.x.shape[0]):
+                if np.random.random()>0.5:
+                    param[i]=x1.x[i]
+                else:
+                    param[i]=x2.x[i]
+            newer.append(Pop(np.array(param)))
+        return newer
     def mute(x):
         for i in range(x.x.shape[0]):
             if np.random.random()<0.3:
@@ -81,8 +83,8 @@ def FindCmb(names,dline,HSI):
         if len(pop)>2000:
             pop=pop[:1500]
         nextpop=[]
-        for i in range(1,100,2):
-            nextpop.extend(mate(pop[i],pop[i-1]))
+        for i in range(50):
+            nextpop.extend(mate(pop[np.random.randint(0,100)],pop[np.random.randint(0,100)]))
         for o in nextpop:
             if np.random.random()<0.3:
                 mute(o)
