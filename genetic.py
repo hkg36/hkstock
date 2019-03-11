@@ -8,29 +8,29 @@ def SplitPointToPersent(x):
         x2.append(x[i]-x[i-1])
     x2.append(1-x[-1])
     return np.array(x2)
+def profitfun(x,a,b,c):
+    return a*np.power((1+b),x+c)
+profit_lb=12
+def target(x):
+    x=SplitPointToPersent(x)
+    closeall=np.dot(dline,x)/HSI
+    poslist=np.array(range(len(closeall)))
+    try:
+        popt, pcov=curve_fit(profitfun, poslist, closeall,p0=np.array([1,0,0]))
+    except:
+        return 0,10000000000.0
+    p=((1+popt[1])**250)/1.1
+    p=int((p-1)*100)
+
+    dirline=profitfun(np.array(poslist,dtype=np.float64),*popt)
+    #sqrtmean=np.sqrt(np.sum((closeall-dirline)**2/dirline))
+    errorline=((closeall-dirline)/dirline)**2
+    sqrtmean=np.sqrt(np.mean(errorline))+2*np.sqrt(np.max(errorline))
+    if p<profit_lb:
+        return p,100*(profit_lb-p)+sqrtmean
+    return p,sqrtmean
+
 def FindCmb(names,dline,HSI):
-    def profitfun(x,a,b,c):
-        return a*np.power((1+b),x+c)
-    profit_lb=12
-    def target(x):
-        x=SplitPointToPersent(x)
-        closeall=np.dot(dline,x)/HSI
-        poslist=np.array(range(len(closeall)))
-        try:
-            popt, pcov=curve_fit(profitfun, poslist, closeall,p0=np.array([1,0,0]))
-        except:
-            return 0,10000000000.0
-        p=(1+popt[1])**250
-        p=int((p-1)*100)
-
-        dirline=profitfun(np.array(poslist,dtype=np.float64),*popt)
-        #sqrtmean=np.sqrt(np.sum((closeall-dirline)**2/dirline))
-        errorline=((closeall-dirline)/dirline)**2
-        sqrtmean=np.sqrt(np.mean(errorline))+2*np.sqrt(np.max(errorline))
-        if p<profit_lb:
-            return p,100*(profit_lb-p)+sqrtmean
-        return p,sqrtmean
-
     class Pop(object):
         def __init__(self,x):
             self.x=x
@@ -97,9 +97,11 @@ if __name__ == "__main__":
     import loaddata
     names,dline,HSI=loaddata.LoadData()
     champion_x=FindCmb(names,dline,HSI)
-    indexlist=list(zip(names,champion_x))
+    todayx=champion_x*dline[-1,:]
+    todayx=todayx/np.sum(todayx)
+    indexlist=list(zip(names,todayx))
     print(indexlist)
-    print(champion_x)
+    print(todayx)
     with open("data/cps.txt","wt") as f:
         for n,v in indexlist:
             f.write("{},{}\n".format(n,v))
