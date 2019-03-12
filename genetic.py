@@ -11,9 +11,9 @@ def SplitPointToPersent(x):
 def profitfun(x,a,b,c):
     return a*np.power((1+b),x+c)
 profit_lb=12
-def target(x):
+def target(x,dline,hsi):
     x=SplitPointToPersent(x)
-    closeall=np.dot(dline,x)/HSI
+    closeall=np.dot(dline,x)/hsi
     poslist=np.array(range(len(closeall)))
     try:
         popt, pcov=curve_fit(profitfun, poslist, closeall,p0=np.array([1,0,0]))
@@ -39,7 +39,7 @@ def FindCmb(names,dline,HSI):
         def cp(self):
             return Pop(self.x.copy())
     def eval(pop):
-        res=target(pop.x)
+        res=target(pop.x,dline,HSI)
         pop.p=res[0]
         pop.sq=res[1]
         return pop
@@ -61,7 +61,7 @@ def FindCmb(names,dline,HSI):
         return newer
     def mute(x):
         for i in range(x.x.shape[0]):
-            if np.random.random()<0.3:
+            if np.random.random()<0.2:
                 x.x[i]=np.random.normal(x.x[i],0.2)
                 if x.x[i]<0:
                     x.x[i]=0
@@ -86,7 +86,7 @@ def FindCmb(names,dline,HSI):
         for i in range(50):
             nextpop.extend(mate(pop[np.random.randint(0,100)],pop[np.random.randint(0,100)]))
         for o in nextpop:
-            if np.random.random()<0.3:
+            if np.random.random()<0.2:
                 mute(o)
         nextpop=list(map(eval,nextpop))
         pop.extend(nextpop)

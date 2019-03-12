@@ -46,17 +46,6 @@ def FindCmb(names,dline,HSI):
     prob = pygmo.problem(Problem())
     pop = pygmo.population(prob, len(names)*10)
 
-    """archi = pygmo.archipelago(n = 8, algo = algo, prob = prob, pop_size =100)
-    archi.evolve()
-    archi.wait()
-    res = archi.get_champions_f()
-    bestindex=-1
-    bestres=1e15
-    for i in range(len(res)):
-        if res[i][0]<bestres:
-            bestres=res[i][0]
-            bestindex=i
-    champion_x=archi.get_champions_x()[bestindex]"""
     champion_x_old=None
     while True:
         pop = algo.evolve(pop)
