@@ -38,6 +38,8 @@ def FindCmb(names,dline,HSI):
             self.sq=float("nan")
         def cp(self):
             return Pop(self.x.copy())
+        def __eq__(self, other):
+            return np.array_equal(self.x,other.x)
     def eval(pop):
         res=target(pop.x,dline,HSI)
         pop.p=res[0]
