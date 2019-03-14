@@ -6,11 +6,15 @@ def SplitPointToPersent(x):
     x2=[x[0]]
     for i in range(1,x.shape[0]):
         x2.append(x[i]-x[i-1])
-    x2.append(1-x[-1])
-    return np.array(x2)
+    x2.append(splitsize-x[-1])
+    res=np.array(x2)*splitcell
+    #assert abs(np.sum(res)-1.0)<0.0000000001
+    return res
 def profitfun(x,a,b,c):
     return a*np.power((1+b),x+c)
 profit_lb=12
+splitsize=1000
+splitcell=1/1000
 def target(x,dline,hsi):
     x=SplitPointToPersent(x)
     closeall=np.dot(dline,x)/hsi
@@ -47,7 +51,7 @@ def FindCmb(names,dline,HSI):
         return pop
     pop=[]
     for i in range(300):
-        p=Pop(np.random.rand(len(names)-1))
+        p=Pop(np.random.random_integers(0,splitsize,len(names)-1))
         pop.append(p)
     pop=[eval(one) for one in pop]
     def mate(x1,x2):
@@ -64,11 +68,11 @@ def FindCmb(names,dline,HSI):
     def mute(x):
         for i in range(x.x.shape[0]):
             if np.random.random()<0.2:
-                x.x[i]=np.random.normal(x.x[i],0.2)
+                x.x[i]=np.random.poisson(x.x[i])
                 if x.x[i]<0:
                     x.x[i]=0
-                elif x.x[i]>1:
-                    x.x[i]=1
+                elif x.x[i]>splitsize:
+                    x.x[i]=splitsize
 
     minsq=100000000000
     keepcount=0
@@ -99,8 +103,8 @@ if __name__ == "__main__":
     import loaddata
     names,dline,HSI=loaddata.LoadData()
     champion_x=FindCmb(names,dline,HSI)
-    todayx=champion_x*dline[-1,:]
-    todayx=todayx/np.sum(todayx)
+    todayx=champion_x#*dline[-1,:]
+    #todayx=todayx/np.sum(todayx)
     indexlist=list(zip(names,todayx))
     print(indexlist)
     print(todayx)

@@ -20,12 +20,12 @@ def LoadData():
             his.append(line["adj close"])
         dline.append(his)
     dline=np.array(dline).T
-    dline/=dline[0,:]
+    dline/=dline[-1,:]
 
     HSI=[]
     res=db["HSI"].find({"_id":{"$gte":starttime.timestamp(),"$lte":endtime.timestamp()}}).sort("_id",1)
     for one in res:
         HSI.append(one["close"])
     HSI=np.array(HSI)
-    HSI=HSI/HSI[0]
+    HSI=HSI/HSI[-1]
     return lines,dline,HSI

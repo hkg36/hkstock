@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 from matplotlib import gridspec,patches
 
 def Show(dline,HSI,champion_x):
+    champion_x=champion_x*dline[0,:]
+    champion_x/=np.sum(champion_x)
+    dline/=dline[0,:]
+    HSI/=HSI[0]
     tgtline=np.dot(dline,champion_x)
     diffline=tgtline-HSI
     poslist=np.array(range(len(tgtline)))
