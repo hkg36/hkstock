@@ -13,8 +13,8 @@ def SplitPointToPersent(x):
 def profitfun(x,a,b,c):
     return a*np.power((1+b),x+c)
 profit_lb=20
-splitsize=1000
-splitcell=1/1000
+splitsize=200
+splitcell=1/splitsize
 def target(x,dline,hsi):
     x=SplitPointToPersent(x)
     closeall=np.dot(dline,x)/hsi
@@ -115,7 +115,12 @@ def Cacl(dline,HSI,champion_x):
 if __name__ == "__main__":
     import show
     import loaddata
-    names,dline,HSI=loaddata.LoadData()
+    import json
+    import datetime
+    starttime=datetime.datetime(2018,1,1)
+    endtime=datetime.datetime(2019,1,10)
+    pointDate=datetime.datetime(2019,1,3)
+    names,dline,HSI,_=loaddata.LoadData(starttime,endtime,pointDate)
     champion_x=FindCmb(names,dline,HSI)
     todayx=champion_x#*dline[-1,:]
     #todayx=todayx/np.sum(todayx)
@@ -125,5 +130,7 @@ if __name__ == "__main__":
     with open("data/cps.txt","wt") as f:
         for n,v in indexlist:
             f.write("{},{}\n".format(n,v))
+    with open("data/cps.json","wt") as f:
+        json.dump({"time":endtime.timestamp(),"cp":indexlist},f)
     Cacl(dline,HSI,champion_x)
     show.Show(dline,HSI,champion_x)

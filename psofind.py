@@ -59,7 +59,7 @@ def FindCmb(names,dline,HSI):
 if __name__ == "__main__":
     import show
     import loaddata
-    names,dline,HSI=loaddata.LoadData()
+    names,dline,HSI,_=loaddata.LoadData()
     champion_x=FindCmb(names,dline,HSI)
     indexlist=list(zip(names,champion_x))
     print(indexlist)
