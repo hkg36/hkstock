@@ -12,7 +12,7 @@ def SplitPointToPersent(x):
     return res
 def profitfun(x,a,b,c):
     return a*np.power((1+b),x+c)
-profit_lb=12
+profit_lb=20
 splitsize=1000
 splitcell=1/1000
 def target(x,dline,hsi):
@@ -97,7 +97,21 @@ def FindCmb(names,dline,HSI):
         nextpop=list(map(eval,nextpop))
         pop.extend(nextpop)
     return SplitPointToPersent(pop[0].x)
-
+def Cacl(dline,HSI,champion_x):
+    closeall=np.dot(dline,champion_x)/HSI
+    dayr=(closeall[1:]-closeall[:-1])/closeall[:-1]
+    exre=dayr-0.04/250
+    sharp=np.sqrt(250)*np.mean(exre)/np.std(exre)
+    lasthigh=closeall[0]
+    rollback=0
+    for i in range(1,closeall.shape[0]):
+        if closeall[i]>lasthigh:
+            lasthigh=closeall[i]
+        else:
+            rb=(lasthigh-closeall[i])/lasthigh
+            if rb>rollback:
+                rollback=rb
+    print("最大回撤：{}，夏普:{}".format(rollback,sharp))
 if __name__ == "__main__":
     import show
     import loaddata
@@ -111,4 +125,5 @@ if __name__ == "__main__":
     with open("data/cps.txt","wt") as f:
         for n,v in indexlist:
             f.write("{},{}\n".format(n,v))
+    Cacl(dline,HSI,champion_x)
     show.Show(dline,HSI,champion_x)
